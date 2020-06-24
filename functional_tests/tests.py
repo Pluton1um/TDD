@@ -1,3 +1,4 @@
+import os
 import time
 import unittest
 
@@ -15,6 +16,9 @@ class NewVisitorTest(StaticLiveServerTestCase):
 
     def setUp(self):
         self.browser = webdriver.Firefox()
+        staging_server = os.environ.get('STAGING_SERVER')
+        if staging_server:
+            self.live_server_url = 'http://' + staging_server
 
     def tearDown(self):
         self.browser.quit()
@@ -38,7 +42,7 @@ class NewVisitorTest(StaticLiveServerTestCase):
                 time.sleep(0.5)
 
     def test_can_start_a_list_for_one_user(self):
-    # def test_can_start_a_list_and_retrieve_it_later(self):
+        # def test_can_start_a_list_and_retrieve_it_later(self):
         self.browser.get(self.live_server_url)
 
         self.assertIn('To-Do', self.browser.title)
@@ -77,7 +81,7 @@ class NewVisitorTest(StaticLiveServerTestCase):
         inputbox.send_keys('Buy peacock feathers')
         inputbox.send_keys(Keys.ENTER)
         self.wait_for_row_in_list_table('1: Buy peacock feathers')
-        
+
         edith_list_url = self.browser.current_url
         self.assertRegex(edith_list_url, '/lists/.+')
 
@@ -101,12 +105,12 @@ class NewVisitorTest(StaticLiveServerTestCase):
         page_text = self.browser.find_element_by_tag_name('body').text
         self.assertNotIn('Buy peacock feathers', page_text)
         self.assertIn('Buy milk', page_text)
-        
+
     def test_layout_and_styling(self):
-        
+
         self.browser.get(self.live_server_url)
         self.browser.set_window_size(1024, 768)
-        
+
         inputbox = self.browser.find_element_by_id('id_new_item')
         inputbox.send_keys('testing')
         inputbox.send_keys(Keys.ENTER)
